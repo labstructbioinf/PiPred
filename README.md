@@ -32,7 +32,7 @@ This should produce output **`example/1mty_C.out`** identical to **`example/1mty
 
 ## **Usage** ##
 ```bash
-pipred.py [-h] -i FILE [-out_path DIR] [-pssm_path DIR]
+python3.5 pipred.py [-h] -i FILE [-out_path DIR] [-pssm_path DIR]
 ```
 | Option    | Description |
 |:----------:|-------------|
@@ -50,4 +50,8 @@ PSSM file should be named **`1mty_C.pssm`**.
 You can generate PSSM files with the following command (requires NR90 database):
 ```bash
 psiblast -query 1mty_C.fasta -db NR90_LOCATION -evalue 0.001 -num_iterations 3 -out_ascii_pssm 1mty_C.pssm
+```
+In order to generate PSSM file from multiple sequence alignment (MSA) you can use this command:
+```bash
+psiblast -subject sequence.fasta -in_msa alignment.fasta -out_ascii_pssm output.pssm
 ```
