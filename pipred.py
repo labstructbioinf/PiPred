@@ -7,7 +7,13 @@ import numpy as np
 from utils import enc_seq_onehot, enc_pssm, is_fasta, get_pssm_sequence, PiPred_Model, decode
 import keras.backend as K
 
-my_loc = os.path.dirname(os.path.abspath(__file__))
+# cx_freeze specific
+if getattr(sys, 'frozen', False):
+    my_loc = os.path.dirname(os.path.abspath(sys.executable))
+else:
+    my_loc = os.path.dirname(os.path.realpath(__file__))
+print(my_loc)
+#my_loc = os.path.dirname(os.path.abspath(__file__))
 parser = argparse.ArgumentParser(description='PiPred')
 parser.add_argument('-i',
                     help='Input file with sequence in fasta format.',
