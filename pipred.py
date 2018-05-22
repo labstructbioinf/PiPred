@@ -12,7 +12,7 @@ if getattr(sys, 'frozen', False):
     my_loc = os.path.dirname(os.path.abspath(sys.executable))
 else:
     my_loc = os.path.dirname(os.path.realpath(__file__))
-print(my_loc)
+
 #my_loc = os.path.dirname(os.path.abspath(__file__))
 parser = argparse.ArgumentParser(description='PiPred')
 parser.add_argument('-i',
