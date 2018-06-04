@@ -87,9 +87,7 @@ for entry, seq in zip(entries, sequences):
         print("ERROR: Sequence in PSSM file does not match fasta sequence for entry %s!" % entry)
         exit()
     try:
-
         parsed_pssm = np.genfromtxt(pssm_fn, skip_header=3, skip_footer=5, usecols=(i for i in range(2, 22)))
-        
     except ValueError:
         print("ERROR: Malformed PSSM file for entry %s!" % entry)
         exit()
