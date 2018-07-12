@@ -7,8 +7,6 @@ First clone this repository:
 $ git clone https://github.com/labstructbioinf/PiPred.git
 $ cd PiPred
 ```
-Due to the size, weight files for the model have to be downloaded separately from
-our website http://lbs.cent.uw.edu.pl 
 
 Required packages to run PiPred are listed in the **`requirements.txt`** file.
 We suggest running PiPred in the virtual environment:
