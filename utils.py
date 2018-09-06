@@ -61,14 +61,46 @@ def enc_seq_onehot(seq, pad_length=None, pad_left=0):
         return pad_matrix
     return matrix
 
+
+
+def seq_split(seq, common=50, part=500):
+    split_seq = []
+    n_split = 0 
+    for i in range(0,len(seq),part-common):
+        split_seq.append(seq[i:min(i+part,len(seq))])
+        n_split+=1
+        if i+part >=len(seq):
+            break
+    return split_seq, n_split
+
+
+
+def pssm_split(pssm_file, common=50,part=500):
+    pssm_matrix = np.genfromtxt(pssm_file, skip_header=3, skip_footer=5, usecols=(i for i in range(2, 22)))
+    split_pssm = []
+    for i in range(0,len(pssm_matrix),part-common):
+        split_pssm.append(pssm_matrix[i:min(i+part,len(pssm_matrix))])
+        if i+part >=len(pssm_matrix):
+            break
+    return split_pssm
+
+
+
+
+
 # Encodes PSSM
-def enc_pssm(pssm_file, pad_length=None, pad_left=0):
-    pssm_matrix = sigmoid(np.genfromtxt(pssm_file, skip_header=3, skip_footer=5, usecols=(i for i in range(2, 22))))
+def enc_pssm(pssm_matrix, pad_length=None, pad_left=0):
+   # pssm_matrix = sigmoid(np.genfromtxt(pssm_file, skip_header=3, skip_footer=5, usecols=(i for i in range(2, 22))))
     if pad_length:
         pad_matrix = np.zeros((pad_length, 20))
         pad_matrix[pad_left:pssm_matrix.shape[0] + pad_left, 0:pssm_matrix.shape[1]] = pssm_matrix
         return pad_matrix
     return pssm_matrix
+
+
+
+
+
 
 # Decodes predictions (takes into the account padding of sequence)
 def decode(pred, enc_seq):

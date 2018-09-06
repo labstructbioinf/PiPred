@@ -4,9 +4,9 @@ import os
 import sys
 import random
 import numpy as np
-from utils import enc_seq_onehot, enc_pssm, is_fasta, get_pssm_sequence, PiPred_Model, decode,exit
+from utils import enc_seq_onehot, enc_pssm, is_fasta, get_pssm_sequence, PiPred_Model, decode,exit, seq_split, pssm_split
 import keras.backend as K
-
+import h5py
 # cx_freeze specific
 if getattr(sys, 'frozen', False):
     my_loc = os.path.dirname(os.path.abspath(sys.executable))
@@ -63,7 +63,7 @@ if not len(entries) == len(set(entries)):
 # Check sequence length and presence of non standard residues
 aa1 = "ACDEFGHIKLMNPQRSTVWY"
 for entry, seq in zip(entries, sequences):
-    if not (len(seq) >= 25 and len(seq) <= 700):
+    if len(seq) < 25:
         print('ERROR: Not accepted sequence length (ID %s - %s). Only sequences between 30 and 700 residues are accepted!' % (
         entry, len(seq)))
         exit()
@@ -103,11 +103,18 @@ for entry, seq in zip(entries, sequences):
 print("Encoding sequences...")
 # Encode sequence into vector format
 enc_sequences = []
+common = 50
+splits_len = []
+
 for seq, pssm_fn in zip(sequences, pssm_files):
-    pad_left = random.randint(0, 700 - len(seq))
-    enc_sequences.append(np.concatenate((enc_seq_onehot(seq, pad_length=700),
-                                         enc_pssm(pssm_fn, pad_length=700)), axis=1))
-    
+    splitted_seq = seq_split(seq,common)
+    seq_splitted,n_split, pssm_splitted = splitted_seq[0], splitted_seq[1],pssm_split(pssm_fn, common)
+    splits_len.append(n_split)		
+    for seq_s, s_pssm in zip(seq_splitted, pssm_splitted):
+        enc_sequences.append(np.concatenate((enc_seq_onehot(seq_s, pad_length=700),
+					enc_pssm(s_pssm, pad_length=700)), axis=1))
+
+
 # Create model (supress warnings).
 stderr = sys.stderr
 sys.stderr = open(os.devnull, 'w')
@@ -120,30 +127,35 @@ ensemble_results = {}
 print("Predicting...")
 for i in range(1, 4):
     model.load_weights('%s/weights/weights_pipred_%s.h5' % (my_loc, i))
-    predictions = model.predict(enc_sequences)
+    predictions = model.predict(enc_sequences)[:,:,2:3]
     decoded_predictions = [decode(pred, encoded_seq) for pred, encoded_seq in
                      zip(predictions, enc_sequences)]
-    for decoded_prediction, entry in zip(decoded_predictions, entries):
-        if i == 1:
-            ensemble_results[entry] = []
-        k = 0
-        for aa_col in decoded_prediction.T:
-            if i == 1:
-                ensemble_results[entry].append(aa_col)
+    cnt = 0
+    for n, n_split in enumerate(splits_len):
+            ns = decoded_predictions[cnt].shape[0]
+           
+            start=0			
+            if n_split == 1:
+                decoded_prediction = np.zeros((ns,1))
+                decoded_prediction+=decoded_predictions[cnt]
             else:
-                ensemble_results[entry][k] = np.vstack((ensemble_results[entry][k], aa_col))
-            k += 1
+                decoded_prediction = np.array([])
+                for j in range(n_split-1):
+                    div=min(common,len(decoded_predictions[cnt+j+1]))
+                    decoded_prediction = np.concatenate([decoded_prediction,decoded_predictions[cnt+j][:ns-div], (decoded_predictions[cnt+j][ns-div:]+decoded_predictions[cnt+j+1][:div])/2])
+                    start = div
+                if len(decoded_predictions[n_split-1])>common:	           
+                    decoded_prediction = np.concatenate([decoded_prediction,decoded_predictions[n_split-1][common:]])
+            entry = entries[n]
+            if i == 1:
+                ensemble_results[entry] = decoded_prediction
+            else:
+                ensemble_results[entry] = np.vstack((ensemble_results[entry], decoded_prediction))
+            cnt+=n_split
 K.clear_session()
-
 # Dump the results
+f = h5py.File(args.out_path+'/out', 'w')
 for entry, seq in zip(entries, sequences):
-    f = open('%s/%s.out' % (args.out_path, entry), 'w')
-    f.write('aa prE   prH   prI   prC\n')
-    final_results = np.asarray([np.average(ss_col, axis=0) for ss_col in ensemble_results[entry]])
-    for aa, probs in zip(seq, final_results.T):
-        f.write("%s " % aa)
-        for prob in probs:
-             f.write(" %.3f" % prob)
-        f.write("\n")
-    f.close()
+    f.create_dataset(data=np.average(ensemble_results[entry], axis=0), name=entry)
+f.close()
 print("Done!")
