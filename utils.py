@@ -63,7 +63,7 @@ def enc_seq_onehot(seq, pad_length=None, pad_left=0):
 
 
 
-def seq_split(seq, common=50, part=500):
+def seq_split(seq, common=50, part=700):
     split_seq = []
     n_split = 0 
     for i in range(0,len(seq),part-common):
@@ -75,8 +75,8 @@ def seq_split(seq, common=50, part=500):
 
 
 
-def pssm_split(pssm_file, common=50,part=500):
-    pssm_matrix = np.genfromtxt(pssm_file, skip_header=3, skip_footer=5, usecols=(i for i in range(2, 22)))
+def pssm_split(pssm_file, common=50,part=700):
+    pssm_matrix = sigmoid(np.genfromtxt(pssm_file, skip_header=3, skip_footer=5, usecols=(i for i in range(2, 22))))
     split_pssm = []
     for i in range(0,len(pssm_matrix),part-common):
         split_pssm.append(pssm_matrix[i:min(i+part,len(pssm_matrix))])
@@ -104,11 +104,7 @@ def enc_pssm(pssm_matrix, pad_length=None, pad_left=0):
 
 # Decodes predictions (takes into the account padding of sequence)
 def decode(pred, enc_seq):
-    decoded_pred = []
-    for pos_pred, pos_seq in zip(pred, enc_seq):
-        if not np.array_equal(pos_seq, np.zeros(40)):
-            decoded_pred.append(pos_pred)
-    return np.asarray(decoded_pred)
+	return np.delete(pred, np.where(~enc_seq.any(axis=1)), axis=0)
 
 # Pipred model architecture
 def PiPred_Model():

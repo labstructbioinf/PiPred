@@ -130,10 +130,10 @@ for i in range(1, 4):
     predictions = model.predict(enc_sequences)[:,:,2:3]
     decoded_predictions = [decode(pred, encoded_seq) for pred, encoded_seq in
                      zip(predictions, enc_sequences)]
+    
     cnt = 0
     for n, n_split in enumerate(splits_len):
             ns = decoded_predictions[cnt].shape[0]
-           
             start=0			
             if n_split == 1:
                 decoded_prediction = np.zeros((ns,1))
@@ -142,7 +142,7 @@ for i in range(1, 4):
                 decoded_prediction = np.array([])
                 for j in range(n_split-1):
                     div=min(common,len(decoded_predictions[cnt+j+1]))
-                    decoded_prediction = np.concatenate([decoded_prediction,decoded_predictions[cnt+j][:ns-div], (decoded_predictions[cnt+j][ns-div:]+decoded_predictions[cnt+j+1][:div])/2])
+                    decoded_prediction = np.concatenate([decoded_predictions[cnt+j][:ns-div], (decoded_predictions[cnt+j][ns-div:]+decoded_predictions[cnt+j+1][:div])/2])
                     start = div
                 if len(decoded_predictions[n_split-1])>common:	           
                     decoded_prediction = np.concatenate([decoded_prediction,decoded_predictions[n_split-1][common:]])
