@@ -139,13 +139,19 @@ for i in range(1, 4):
                 decoded_prediction = np.zeros((ns,1))
                 decoded_prediction+=decoded_predictions[cnt]
             else:
-                decoded_prediction = np.array([])
+                decoded_prediction = np.empty([650,1])
+                
                 for j in range(n_split-1):
                     div=min(common,len(decoded_predictions[cnt+j+1]))
-                    decoded_prediction = np.concatenate([decoded_predictions[cnt+j][:ns-div], (decoded_predictions[cnt+j][ns-div:]+decoded_predictions[cnt+j+1][:div])/2])
-                    start = div
-                if len(decoded_predictions[n_split-1])>common:	           
-                    decoded_prediction = np.concatenate([decoded_prediction,decoded_predictions[n_split-1][common:]])
+                    z= (decoded_predictions[cnt+j][ns-div:]+decoded_predictions[cnt+j+1][:div])/2
+              
+                    if j ==1:
+                    	decoded_prediction = np.concatenate([decoded_prediction, decoded_predictions[cnt+j][:ns-div], (decoded_predictions[cnt+j][ns-div:]+decoded_predictions[cnt+j+1][:div])/2], axis=0 )
+                    else:
+                    	decoded_prediction = np.concatenate([decoded_prediction, decoded_predictions[cnt+j][div:ns-div], (decoded_predictions[cnt+j][ns-div:]+decoded_predictions[cnt+j+1][:div])/2], axis=0)
+                    
+                if len(decoded_predictions[cnt + n_split-1])>common:	           
+                    decoded_prediction = np.concatenate([decoded_prediction,decoded_predictions[cnt + n_split-1][common:]])
             entry = entries[n]
             if i == 1:
                 ensemble_results[entry] = decoded_prediction
