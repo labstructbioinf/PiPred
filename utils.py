@@ -72,7 +72,11 @@ def enc_pssm(pssm_file, pad_length=None, pad_left=0):
 
 # Decodes predictions (takes into the account padding of sequence)
 def decode(pred, enc_seq):
-    return np.delete(pred, np.where(~enc_seq.any(axis=1)), axis=0)[:,1]
+    decoded_pred = []
+    for pos_pred, pos_seq in zip(pred, enc_seq):
+        if not np.array_equal(pos_seq, np.zeros(40)):
+            decoded_pred.append(pos_pred)
+    return np.asarray(decoded_pred)
 
 # Pipred model architecture
 def PiPred_Model():
