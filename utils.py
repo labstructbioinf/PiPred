@@ -74,8 +74,6 @@ def enc_pssm(pssm_file, pad_length=None, pad_left=0):
 def decode(pred, enc_sec):
     return pred[np.any(enc_sec, axis=-1), :]
 
-
-
 # Pipred model architecture
 def PiPred_Model():
     inp1 = Input(shape=(700, 40), dtype='float32', name='inp')
