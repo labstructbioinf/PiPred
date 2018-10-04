@@ -90,12 +90,11 @@ for entry, seq in zip(entries, sequences):
         parsed_pssm = np.genfromtxt(pssm_fn, skip_header=3, skip_footer=5, usecols=(i for i in range(2, 22)))
         if parsed_pssm.shape[0] == len(seq) - 2:
             parsed_pssm = np.genfromtxt(pssm_fn, skip_header=3, skip_footer=3, usecols=(i for i in range(2, 22)))
-   
+        elif parsed_pssm.shape[0] != len(seq):
+            raise ValueError
     except ValueError:
         print("ERROR: Malformed PSSM file for entry %s!" % entry)
         exit()
-    
-
     pssm_files.append(pssm_fn)
 
 print("Encoding sequences...")
