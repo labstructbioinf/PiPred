@@ -32,10 +32,9 @@ args = parser.parse_args()
 
 # Verify whether weights files are present
 
-for i in range(1, 4):
-    if not os.path.isfile('%s/weights/weights_pipred_%s.h5' % (my_loc, i)):
-        print("Weight files for the PiPred model are not available.")
-        print("Download weights from http://lbs.cent.uw.edu.pl/")
+for i in range(1, 11):
+    if not os.path.isfile('%s/weights/final_%s.h5' % (my_loc, i)):
+        print("Weight files for the PiPred model are not available in weights directory.")
         exit()
 
 
@@ -115,8 +114,8 @@ enc_sequences = np.asarray(enc_sequences)
 
 ensemble_results = {}
 print("Predicting...")
-for i in range(1, 4):
-    model.load_weights('%s/weights/weights_pipred_%s.h5' % (my_loc, i))
+for i in range(1, 11):
+    model.load_weights('%s/weights/final_%s.h5' % (my_loc, i))
     predictions = model.predict(enc_sequences)
     decoded_predictions = [decode(pred, encoded_seq) for pred, encoded_seq in
                      zip(predictions, enc_sequences)]
@@ -135,7 +134,7 @@ K.clear_session()
 # Dump the results
 for entry, seq in zip(entries, sequences):
     f = open('%s/%s.out' % (args.out_path, entry), 'w')
-    f.write('aa prE   prH   prI   prC\n')
+    f.write('aa prH   prI   prE   prC\n')
     final_results = np.asarray([np.average(ss_col, axis=0) for ss_col in ensemble_results[entry]])
     for aa, probs in zip(seq, final_results.T):
         f.write("%s " % aa)

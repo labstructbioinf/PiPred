@@ -1,3 +1,4 @@
+![Build Status](https://travis-ci.org/labstructbioinf/PiPred.svg?branch=master)
 # **PiPred** #
 Deep learning based prediction of pi-helices in protein sequences.
 
