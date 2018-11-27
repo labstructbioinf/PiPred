@@ -54,3 +54,10 @@ In order to generate PSSM file from multiple sequence alignment (MSA) you can us
 ```bash
 psiblast -subject sequence.fasta -in_msa alignment.fasta -out_ascii_pssm output.pssm
 ```
+
+## **Supplementary files** ##
+
+* Updated CB6133 and CB513 benchmark datasets - [link](https://lbs.cent.uw.edu.pl/pipred/)
+* Results of PFAM scan - [link](https://lbs.cent.uw.edu.pl/pipred/)
+
+
