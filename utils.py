@@ -5,7 +5,7 @@ import numpy as np
 
 stderr = sys.stderr
 sys.stderr = open(os.devnull, 'w')
-from keras.layers import LSTM, Convolution1D, Dropout, BatchNormalization, TimeDistributed, Bidirectional, Input, merge, \
+from keras.layers import LSTM, Concatenate, Convolution1D, Dropout, BatchNormalization, TimeDistributed, Bidirectional, Input, \
     Dense
 from keras.regularizers import l2
 from keras.models import Model
@@ -83,7 +83,7 @@ def PiPred_Model():
     b_b = BatchNormalization()(b)
     e = Convolution1D(64, 7, activation='tanh', padding='same', kernel_regularizer=l2(0.0001))(inp1)
     e_b = BatchNormalization()(e)
-    x = merge([a_b, b_b, e_b], mode='concat', concat_axis=-1)
+    x = Concatenate()([a_b, b_b, e_b])
     t = TimeDistributed(Dense(200, activation='relu', kernel_regularizer=l2(0.0001)))(x)
     k = Bidirectional(LSTM(200, return_sequences=True, activation='tanh', recurrent_activation='sigmoid', dropout=0.5,
                            recurrent_dropout=0.5))(t)
