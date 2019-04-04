@@ -57,7 +57,7 @@ psiblast -subject sequence.fasta -in_msa alignment.fasta -out_ascii_pssm output.
 
 ## **Supplementary files** ##
 
-* Updated CB6133 and CB513 benchmark datasets - [link](https://lbs.cent.uw.edu.pl/pipred/)
-* Results of PFAM scan - [link](https://lbs.cent.uw.edu.pl/pipred/)
+* Updated CB6133 and CB513 benchmark datasets - [link](https://lbs.cent.uw.edu.pl/pipred)
+* Results of PFAM scan - [link](https://lbs.cent.uw.edu.pl/pipred)
 
 
