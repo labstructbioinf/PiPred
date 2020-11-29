@@ -2,17 +2,11 @@ from Bio import SeqIO
 import os
 import sys
 import numpy as np
-
-stderr = sys.stderr
-sys.stderr = open(os.devnull, 'w')
-from keras.layers import LSTM, Concatenate, Convolution1D, Dropout, BatchNormalization, TimeDistributed, Bidirectional, Input, \
+from tensorflow.keras.layers import LSTM, Concatenate, Convolution1D, Dropout, BatchNormalization, TimeDistributed, Bidirectional, Input, \
     Dense
-from keras.regularizers import l2
-from keras.models import Model
-import keras.backend as K
-
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-sys.stderr = stderr
+from tensorflow.keras.regularizers import l2
+from tensorflow.keras.models import Model
+import tensorflow.keras.backend as K
 
 
 # Adapted from https://stackoverflow.com/questions/44293407/how-can-i-check-whether-a-given-file-is-fasta
@@ -47,16 +41,16 @@ def sigmoid(x):
 
 # Encodes amino acid sequence in one-hot format
 def enc_seq_onehot(seq, pad_length=None, pad_left=0):
-    aa1 = list("ACDEFGHIKLMNPQRSTVWY")
+    aa1 = list("ACDEFGHIKLMNPQRSTVWYX")
     aa_indices = {aa1[k]: k for k in range(0, len(aa1))}
     enc_seq = []
     for aa in seq:
-        enc_aa = np.zeros(20)
+        enc_aa = np.zeros(21)
         enc_aa[aa_indices[aa]] = 1
         enc_seq.append(enc_aa)
     matrix = np.asarray(enc_seq)
     if pad_length:
-        pad_matrix = np.zeros((pad_length, 20))
+        pad_matrix = np.zeros((pad_length, 21))
         pad_matrix[pad_left:matrix.shape[0] + pad_left, 0:matrix.shape[1]] = matrix
         return pad_matrix
     return matrix
@@ -76,7 +70,7 @@ def decode(pred, enc_sec):
 
 # Pipred model architecture
 def PiPred_Model():
-    inp1 = Input(shape=(700, 40), dtype='float32', name='inp')
+    inp1 = Input(shape=(700, 41), dtype='float32', name='inp')
     a = Convolution1D(64, 3, activation='tanh', padding='same', kernel_regularizer=l2(0.0001))(inp1)
     a_b = BatchNormalization()(a)
     b = Convolution1D(64, 5, activation='tanh', padding='same', kernel_regularizer=l2(0.0001))(inp1)

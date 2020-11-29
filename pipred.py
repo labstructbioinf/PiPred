@@ -1,19 +1,20 @@
 import argparse
 from Bio import SeqIO
 import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
 import sys
 import random
 import numpy as np
 from utils import enc_seq_onehot, enc_pssm, is_fasta, get_pssm_sequence, PiPred_Model, decode,exit
-import keras.backend as K
+import tensorflow as tf
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+import tensorflow.keras.backend as K
 
-# cx_freeze specific
-if getattr(sys, 'frozen', False):
-    my_loc = os.path.dirname(os.path.abspath(sys.executable))
-else:
-    my_loc = os.path.dirname(os.path.realpath(__file__))
 
-#my_loc = os.path.dirname(os.path.abspath(__file__))
+
+my_loc = os.path.dirname(os.path.abspath(__file__))
+
 parser = argparse.ArgumentParser(description='PiPred')
 parser.add_argument('-i',
                     help='Input file with sequence in fasta format.',
@@ -60,7 +61,7 @@ if not len(entries) == len(set(entries)):
     print("ERROR: Sequence identifiers in the fasta file are not unique!")
     exit()
 # Check sequence length and presence of non standard residues
-aa1 = "ACDEFGHIKLMNPQRSTVWY"
+aa1 = "ACDEFGHIKLMNPQRSTVWYX"
 for entry, seq in zip(entries, sequences):
     if not (len(seq) >= 25 and len(seq) <= 700):
         print('ERROR: Not accepted sequence length (ID %s - %s). Only sequences between 30 and 700 residues are accepted!' % (
@@ -104,11 +105,10 @@ for seq, pssm_fn in zip(sequences, pssm_files):
     enc_sequences.append(np.concatenate((enc_seq_onehot(seq, pad_length=700),
                                          enc_pssm(pssm_fn, pad_length=700)), axis=1))
     
-# Create model (supress warnings).
-stderr = sys.stderr
-sys.stderr = open(os.devnull, 'w')
+# Create model 
 model = PiPred_Model()
-sys.stderr = stderr
+
+
 enc_sequences = np.asarray(enc_sequences)
 
 
