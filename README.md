@@ -1,5 +1,4 @@
 # **PiPred - deep learning based prediction of pi-helices in protein sequences** #
-****
 
 The webserver is available at the MPI Bioinformatics Toolkit (Quick2D tool) - https://toolkit.tuebingen.mpg.de/tools/quick2d
 
