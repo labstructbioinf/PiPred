@@ -14,7 +14,7 @@ Markdown==3.3.3
 numpy==1.18.5
 opt-einsum==3.3.0
 pandas==1.1.4
-protobuf==3.14.0
+protobuf==3.15.0
 python-dateutil==2.8.1
 pytz==2020.4
 scikit-learn==0.23.2
